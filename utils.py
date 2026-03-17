@@ -7,3 +7,40 @@ def uncertainty(label_probs,n_points,measure):
         return np.argsort([np.sort(y)[-1]-np.sort(y)[-2] for y in label_probs])[:n_points]
     if measure=='entropy':
         return np.argsort([-sum(y*np.log(y)) for y in label_probs])[-n_points:]
+
+
+def train_iteratively(Xpool,ypool, Xtest, ytest, model, measure, ninit = 20, addn = 1):
+    order = np.random.permutation(range(len(Xpool)))
+   
+    #initial training set
+    ??? trainset=order[:ninit]
+    poolidx=np.arange(len(Xpool),dtype=int)
+
+    #remove data from pool
+    poolidx=np.setdiff1d(poolidx,trainset)
+    testacc = []
+
+    for i in range(25):
+        data = np.take(Xpool,trainset,axis=0)
+        labels = np.take(ypool,trainset,axis=0)
+        model.fit(data, labels)
+        #predict and calculate the accuracy
+        ypred = model.predict(Xtest)
+
+        #calculate accuracy on test set
+        accuracy = sum(ytest == ypred)/len(ytest)
+        testacc.append((ninit+i*addn,accuracy)) #add in the accuracy
+        print('Model: LR, %i random samples'%(ninit+i*addn))
+
+        #find next index from pool (with highest uncertainty)
+        pool = np.take(Xpool,poolidx,axis=0)
+        prob = model.predict_proba(pool)
+
+        if measure == "random":
+            top_indices = np.random.choice(poolidx, addn)
+        else:
+            top_indices = poolidx[uncertainty(prob,addn,measure)]
+            
+        #update trainset and pool
+        trainset = np.append(trainset, top_indices)
+        poolidx = np.setdiff1d(poolidx,trainset)
