@@ -1,4 +1,5 @@
 from sklearn.model_selection import StratifiedShuffleSplit
+from imblearn.under_sampling import RandomUnderSampler
 
 def prepare_data(cov_type, n_init, n_points ,seed=None):
     """Extract classes and features and split data in training, pool, and test
@@ -13,8 +14,10 @@ def prepare_data(cov_type, n_init, n_points ,seed=None):
     seed : int
         Seed for reproducibility.
     """
-    X = cov_type['data'][:n_points]
-    y = cov_type['target'][:n_points]
+    undersampler=RandomUnderSampler()
+    X,y=undersampler.fit_resample(cov_type['data'],cov_type['target'])
+    # X = cov_type['data'][:n_points]
+    # y = cov_type['target'][:n_points]
 
     n = len(X)
     assert n_init <= n
@@ -40,3 +43,5 @@ def prepare_data(cov_type, n_init, n_points ,seed=None):
             y=y[pool[test]]
         )
     )
+
+print('yes')
