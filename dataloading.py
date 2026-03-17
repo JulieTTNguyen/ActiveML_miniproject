@@ -1,6 +1,6 @@
 from sklearn.model_selection import StratifiedShuffleSplit
 
-def prepare_data(cov_type, n_init, seed=None):
+def prepare_data(cov_type, n_init, n_points ,seed=None):
     """Extract classes and features and split data in training, pool, and test
     sets.
 
@@ -13,8 +13,8 @@ def prepare_data(cov_type, n_init, seed=None):
     seed : int
         Seed for reproducibility.
     """
-    X = cov_type['data'][:1000]
-    y = cov_type['target'][:1000]
+    X = cov_type['data'][:n_points]
+    y = cov_type['target'][:n_points]
 
     n = len(X)
     assert n_init <= n
