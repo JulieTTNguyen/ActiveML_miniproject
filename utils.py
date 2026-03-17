@@ -9,20 +9,25 @@ def uncertainty(label_probs,n_points,measure):
         return np.argsort([-sum(y*np.log(y)) for y in label_probs])[-n_points:]
 
 
-def train_iteratively(Xpool,ypool, Xtest, ytest, model, measure, ninit = 20, addn = 1):
-    order = np.random.permutation(range(len(Xpool)))
-   
+def train_iteratively(data, model, measure, ninit = 20, addn = 1):
+    Xtrain = data["train"]["X"]
+    ytrain = data["train"]["y"]
+
+    Xpool = data["pool"]["X"]
+    ypool = data["pool"]["y"]
+
+    Xtest = data["test"]["X"]
+    ytest = data["test"]["y"]
+    
     #initial training set
-    ??? trainset=order[:ninit]
+    trainset= np.array([])
     poolidx=np.arange(len(Xpool),dtype=int)
 
-    #remove data from pool
-    poolidx=np.setdiff1d(poolidx,trainset)
     testacc = []
 
     for i in range(25):
-        data = np.take(Xpool,trainset,axis=0)
-        labels = np.take(ypool,trainset,axis=0)
+        data = np.vstack((Xtrain,np.take(Xpool,trainset,axis=0)))
+        labels = np.vstack((ytrain,np.take(ypool,trainset,axis=0)))
         model.fit(data, labels)
         #predict and calculate the accuracy
         ypred = model.predict(Xtest)
