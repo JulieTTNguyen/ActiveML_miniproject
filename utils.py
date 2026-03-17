@@ -20,22 +20,21 @@ def train_iteratively(data, model, measure, ninit = 20, addn = 1):
     ytest = data["test"]["y"]
     
     #initial training set
-    trainset= np.array([])
+    trainset= np.array([], dtype=int)
     poolidx=np.arange(len(Xpool),dtype=int)
 
     testacc = []
+    data = Xtrain
+    labels = ytrain
 
     for i in range(25):
-        data = np.vstack((Xtrain,np.take(Xpool,trainset,axis=0)))
-        labels = np.vstack((ytrain,np.take(ypool,trainset,axis=0)))
-        model.fit(data, labels)
+        model.fit(data, labels);
         #predict and calculate the accuracy
         ypred = model.predict(Xtest)
 
         #calculate accuracy on test set
         accuracy = sum(ytest == ypred)/len(ytest)
         testacc.append((ninit+i*addn,accuracy)) #add in the accuracy
-        print('Model: LR, %i random samples'%(ninit+i*addn))
 
         #find next index from pool (with highest uncertainty)
         pool = np.take(Xpool,poolidx,axis=0)
@@ -49,3 +48,9 @@ def train_iteratively(data, model, measure, ninit = 20, addn = 1):
         #update trainset and pool
         trainset = np.append(trainset, top_indices)
         poolidx = np.setdiff1d(poolidx,trainset)
+        
+        #add selected samples to training data
+        data = np.vstack((data, np.take(Xpool, top_indices, axis=0)))
+        labels = np.concatenate((labels, np.take(ypool, top_indices, axis=0)))
+
+    return testacc

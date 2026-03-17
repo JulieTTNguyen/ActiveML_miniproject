@@ -92,6 +92,7 @@ def prepare_data(cov_type, n_init, n_points=None, seed=None):
         - 'test': held-out test set
     """
 
+    # PCA HER?????
     X = cov_type['data']
     y = cov_type['target']
 
