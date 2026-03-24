@@ -117,15 +117,13 @@ def prepare_data(cov_type, n_init, n_points=None, seed=None,n_components=4, even
             rus = RandomUnderSampler(sampling_strategy='auto', random_state=42)
             X, y = rus.fit_resample(X, y)
 
-
-
-
     # --- Step 1: split into train+pool and test (stratified) ---
     sss = StratifiedShuffleSplit(
         n_splits=1,
         test_size=0.2,
         random_state=seed
     )
+    
     train_pool_idx, test_idx = next(sss.split(X, y))
 
     X_train_pool = X[train_pool_idx]
