@@ -8,13 +8,13 @@ from collections import defaultdict
 import pandas as pd
 
 ### ---- Are we doing it with the even distribution? ----
-even_distribution=True
+even_distribution=False
 
 ### ---- Definitions ----
 model=LogisticRegression(solver='lbfgs', max_iter=400)
 methods=['random','margin','least_confident','entropy']
 addition=1
-iterations=50
+iterations=100
 
 ### ---- Load dataset ----
 cov_type = fetch_covtype()
@@ -22,7 +22,7 @@ cov_type = fetch_covtype()
 ### ---- Loop to run the analysis multiple times ----
 results_total=defaultdict(list)
 results_by_class=defaultdict(list)
-for i in range(1):
+for i in range(2):
     ## -- Get data --
     data,explained_var = prepare_data(
     cov_type,
@@ -31,17 +31,16 @@ for i in range(1):
     seed=np.random.randint(0,20000000),
     even_distribution=even_distribution)
 
-
     ## -- Train for all methods--
+
     for method in methods:
         print(f'{method} in iteration {i}')
         test_acc,test_acc_by_class=train_iteratively(
             data=data,model=model,measure=method,addn=addition,iterations=iterations)
-        
         ## -- Save results --
         results_total[method].append(test_acc)
         results_by_class[method].append(test_acc_by_class)
-
+    
 
 ### ---- Save as files ----
 results_total=pd.DataFrame(results_total)
