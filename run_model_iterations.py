@@ -28,7 +28,7 @@ for i in range(1):
     cov_type,
     n_init=14,
     n_points=30000,   # optional (set None to use full dataset)
-    seed=i,
+    seed=np.random.randint(0,20000000),
     even_distribution=even_distribution)
 
 
@@ -48,8 +48,8 @@ results_total=pd.DataFrame(results_total)
 results_by_class=pd.DataFrame(results_by_class)
 
 if even_distribution:
-    results_total.to_csv('results/even_total_accuracy.csv')
-    results_by_class.to_csv('results/even_class_accuracy.csv')
+    results_total.to_csv('results/even_total_accuracy.csv',index=False,header=False,mode='a')
+    results_by_class.to_csv('results/even_class_accuracy.csv',index=False,header=False,mode='a')
 else:
-    results_total.to_csv('results/uneven_total_accuracy.csv')
-    results_by_class.to_csv('results/uneven_class_accuracy.csv')
+    results_total.to_csv('results/uneven_total_accuracy.csv',index=False,header=False,mode='a')
+    results_by_class.to_csv('results/uneven_class_accuracy.csv',index=False,header=False,mode='a')
