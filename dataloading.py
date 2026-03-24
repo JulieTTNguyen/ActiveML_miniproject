@@ -1,5 +1,6 @@
 import numpy as np
 from sklearn.model_selection import StratifiedShuffleSplit
+from imblearn.under_sampling import RandomUnderSampler
 from sklearn.decomposition import PCA
 
 
@@ -66,7 +67,7 @@ def initial_stratified_with_coverage(X, y, n_init=20, seed=None):
     return initial_idx
 
 
-def prepare_data(cov_type, n_init, n_points=None, seed=None,n_components=4):
+def prepare_data(cov_type, n_init, n_points=None, seed=None,n_components=4, even_distribution = False):
     """
     Prepare dataset for active learning by creating:
     - Initial labeled training set (with class coverage)
@@ -93,7 +94,7 @@ def prepare_data(cov_type, n_init, n_points=None, seed=None,n_components=4):
         - 'test': held-out test set
     """
 
-    # PCA HER?????
+    #---PCA---
     X = cov_type['data']
     pca=PCA(n_components=n_components)
     X=(X-X.mean())/np.std(X)
@@ -101,15 +102,23 @@ def prepare_data(cov_type, n_init, n_points=None, seed=None,n_components=4):
     explained_var=pca.explained_variance_ratio_
     y = cov_type['target']
 
+
     # --- Optional: reduce dataset size using stratified sampling ---
     if n_points is not None and n_points < len(X):
-        sss = StratifiedShuffleSplit(
-            n_splits=1,
-            train_size=n_points,
-            random_state=seed
-        )
-        idx, _ = next(sss.split(X, y))
-        X, y = X[idx], y[idx]
+        if not even_distribution:
+            sss = StratifiedShuffleSplit(
+                n_splits=1,
+                train_size=n_points,
+                random_state=seed
+            )
+            idx, _ = next(sss.split(X, y))
+            X, y = X[idx], y[idx]
+        else:
+            rus = RandomUnderSampler(sampling_strategy='auto', random_state=42)
+            X, y = rus.fit_resample(X, y)
+
+
+
 
     # --- Step 1: split into train+pool and test (stratified) ---
     sss = StratifiedShuffleSplit(
