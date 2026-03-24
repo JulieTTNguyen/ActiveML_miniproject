@@ -16,10 +16,12 @@ data, explained_var = prepare_data(
 )
 
 ## ---- Plot components ----
-print([0]+list(np.cumsum(explained_var)))
-plt.plot(np.array([0]+list(np.cumsum(explained_var))))
-plt.title('Analysis of Components in PCA')
+print('Explained variance for the components:',np.cumsum(explained_var)[:8])
+plt.plot(np.array([0]+list(np.cumsum(explained_var)))[:9])
+plt.title('Analysis of first 8 principal components in PCA')
 plt.xlabel('Number of components')
 plt.ylabel('Explained variance')
-plt.ylim((0.0,1.1))
-plt.show()
+plt.ylim((0.5,1.05))
+plt.hlines(y=0.99,xmin=0,xmax=8,colors='orange',linestyles='--',label='99% explained ')
+plt.legend()
+plt.savefig('figures/PCA_components.pdf',format='pdf')
