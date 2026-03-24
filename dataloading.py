@@ -1,5 +1,6 @@
 import numpy as np
 from sklearn.model_selection import StratifiedShuffleSplit
+from sklearn.decomposition import PCA
 
 
 def initial_stratified_with_coverage(X, y, n_init=20, seed=None):
@@ -65,7 +66,7 @@ def initial_stratified_with_coverage(X, y, n_init=20, seed=None):
     return initial_idx
 
 
-def prepare_data(cov_type, n_init, n_points=None, seed=None):
+def prepare_data(cov_type, n_init, n_points=None, seed=None,n_components=4):
     """
     Prepare dataset for active learning by creating:
     - Initial labeled training set (with class coverage)
@@ -94,6 +95,10 @@ def prepare_data(cov_type, n_init, n_points=None, seed=None):
 
     # PCA HER?????
     X = cov_type['data']
+    pca=PCA(n_components=n_components)
+    X=(X-X.mean())/np.std(X)
+    X=pca.fit_transform(X)
+    explained_var=pca.explained_variance_ratio_
     y = cov_type['target']
 
     # --- Optional: reduce dataset size using stratified sampling ---
@@ -132,7 +137,7 @@ def prepare_data(cov_type, n_init, n_points=None, seed=None):
     )
 
     # --- Construct final splits ---
-    return {
+    return ({
         "train": {
             "X": X_train_pool[init_rel_idx],
             "y": y_train_pool[init_rel_idx],
@@ -145,4 +150,4 @@ def prepare_data(cov_type, n_init, n_points=None, seed=None):
             "X": X_test,
             "y": y_test,
         },
-    }
+    },explained_var)
