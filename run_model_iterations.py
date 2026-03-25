@@ -22,7 +22,7 @@ cov_type = fetch_covtype()
 ### ---- Loop to run the analysis multiple times ----
 results_total=defaultdict(list)
 results_by_class=defaultdict(list)
-for i in range(2):
+for i in range(20):
     ## -- Get data --
     data,explained_var = prepare_data(
     cov_type,
